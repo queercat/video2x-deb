@@ -21,11 +21,21 @@ jobs:
         run: |
           CONTAINER_ID=$(docker create video2x-deb)
           mkdir -p ./artifacts
-          docker cp $CONTAINER_ID:/video2x/ ./artifacts/
+          docker cp $CONTAINER_ID:/video2x/video2x-linux-ubuntu-amd64.deb ./artifacts/
           docker rm $CONTAINER_ID
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: video2x
-          path: ./artifacts/
+          path: ./artifacts/video2x-linux-ubuntu-amd64.deb
+
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./artifacts/video2x-linux-ubuntu-amd64.deb
+          generate_release_notes: true
+          tag_name: v${{ github.run_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
