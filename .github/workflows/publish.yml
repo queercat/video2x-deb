@@ -21,11 +21,11 @@ jobs:
         run: |
           CONTAINER_ID=$(docker create video2x-deb)
           mkdir -p ./artifacts
-          docker cp $CONTAINER_ID:/video2x/video2x-linux-ubuntu-amd64/*.deb ./artifacts/
+          docker cp $CONTAINER_ID:/video2x/video2x-linux-ubuntu-amd64/./artifacts/
           docker rm $CONTAINER_ID
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: video2x
-          path: ./artifacts/*.deb
+          path: ./artifacts/
