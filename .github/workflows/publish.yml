@@ -1,0 +1,38 @@
+name: Extract DEB from Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update and install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cargo git
+
+      - name: Set up cargo PATH
+        run: echo "/root/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install just
+        run: cargo install just
+
+      - name: Build video2x
+        run: |
+          git clone --recurse-submodules https://github.com/k4yt3x/video2x.git
+          cd video2x
+          just ubuntu2404
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-package
+          path: ./video2x/**/*.deb
