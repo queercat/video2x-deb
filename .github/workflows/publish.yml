@@ -9,30 +9,23 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update and install dependencies
+      - name: Build Docker image
+        run: docker build -t video2x-deb .
+
+      - name: Create container and copy .deb file
         run: |
-          sudo apt update
-          sudo apt install -y cargo git
-
-      - name: Set up cargo PATH
-        run: echo "/root/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Install just
-        run: cargo install just
-
-      - name: Build video2x
-        run: |
-          git clone --recurse-submodules https://github.com/k4yt3x/video2x.git
-          cd video2x
-          just ubuntu2404
+          CONTAINER_ID=$(docker create video2x-deb)
+          mkdir -p ./artifacts
+          docker cp $CONTAINER_ID:/video2x/video2x-linux-ubuntu-amd64/*.deb ./artifacts/
+          docker rm $CONTAINER_ID
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: deb-package
-          path: ./video2x/**/*.deb
+          name: video2x
+          path: ./artifacts/*.deb
