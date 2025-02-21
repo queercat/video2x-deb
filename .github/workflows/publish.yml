@@ -21,7 +21,7 @@ jobs:
         run: |
           CONTAINER_ID=$(docker create video2x-deb)
           mkdir -p ./artifacts
-          docker cp $CONTAINER_ID:/video2x/video2x-linux-ubuntu-amd64/./artifacts/
+          docker cp $CONTAINER_ID:/video2x/ ./artifacts/
           docker rm $CONTAINER_ID
 
       - name: Upload artifact
